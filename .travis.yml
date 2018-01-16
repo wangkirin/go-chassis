@@ -1,0 +1,56 @@
+language: go
+
+sudo: required
+
+services:
+  - docker
+
+go:
+  - 1.8.3
+
+before_install:
+  - go get github.com/ServiceComb/go-sc-client
+  - go get github.com/ServiceComb/go-archaius
+  - go get github.com/ServiceComb/cse-collector
+  - go get github.com/ServiceComb/auth
+  - go get github.com/ServiceComb/go-cc-client
+  - go get github.com/ServiceComb/http-client
+  - go get github.com/ServiceComb/paas-lager
+  - go get github.com/golang/lint/golint
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/tedsuo/rata
+  - go get github.com/onsi/ginkgo
+  - go get github.com/onsi/ginkgo/config
+  - go get github.com/onsi/ginkgo/types
+  - go get github.com/onsi/ginkgo/ginkgo
+  - go get github.com/onsi/gomega
+  - go get github.com/onsi/gomega/gbytes
+  - go get github.com/FiloSottile/gvt
+
+before_script:
+  - docker pull servicecomb/service-center
+  - docker run -d -p 30100:30100 servicecomb/service-center:latest
+  - mkdir -p $HOME/gopath/src/github.com/ServiceComb/go-chassis
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/ServiceComb/go-chassis/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/ServiceComb/go-chassis
+  - cd $HOME/gopath/src/github.com/ServiceComb/go-chassis
+  - gvt restore
+
+install: true
+
+jobs:
+  include:
+    - stage: Building Go Chassis
+      script: go build
+    - stage: Go Vet
+      script: go vet ./...
+    - stage: Go cyclo
+      script: gocyclo -over 19 $GO_FILES
+    - stage: Unit Testing
+      script: go test -v $(go list ./...| grep -v /vendor/| grep -v /third_party/)
+    - stage: Coverage Test
+      script: $HOME/gopath/bin/goveralls -coverprofile=coverage.txt -service=travis-ci
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
