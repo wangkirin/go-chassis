@@ -44,9 +44,9 @@ jobs:
     - stage: Building Go Chassis
       script: go build
     - stage: Go Vet
-      script: go vet ./...
+      script: go vet $(go list ./...| grep -v /vendor/| grep -v /third_party/)
     - stage: Go cyclo
-      script: gocyclo -over 19 $GO_FILES
+      script: gocyclo -over 19 $(go list ./...| grep -v /vendor/| grep -v /third_party/)
     - stage: Unit Testing
       script: go test -v $(go list ./...| grep -v /vendor/| grep -v /third_party/)
     - stage: Coverage Test
