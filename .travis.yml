@@ -45,10 +45,11 @@ jobs:
       script: go build
     - stage: Unit Testing
       script: go test -v $(go list ./...| grep -v /vendor/| grep -v /third_party/)
-    - stage: Go cyclo
-      script: gocyclo -over 19 $GO_FILES
     - stage: Coverage Test
       script: $HOME/gopath/bin/goveralls -coverprofile=coverage.txt -service=travis-ci
+    - stage: Go cyclo
+      script: gocyclo -over 19 $GO_FILES
+
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
