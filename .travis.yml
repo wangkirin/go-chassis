@@ -9,6 +9,8 @@ before_script:
   - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/ServiceComb/go-chassis/
   - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/ServiceComb/go-chassis
   - cd $HOME/gopath/src/github.com/ServiceComb/go-chassis
+  - export COVERALLS_SERVICE_NAME=travis-ci
+  - export COVERALLS_REPO_TOKEN=EIXlwEJw7R0TqDPcn9bD1GQUIwvcfDe9d
 
 jobs:
   include:
